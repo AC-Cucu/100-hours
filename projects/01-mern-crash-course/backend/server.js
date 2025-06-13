@@ -8,8 +8,7 @@ dotenv.config()
 const app = express()
 
 app.get('/products', (request, response) => {})
-
-
+app.post('/products', (request, response) => {})
 
 app.listen(5000, () => {
   connectDB()
