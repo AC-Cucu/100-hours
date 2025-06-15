@@ -81,7 +81,7 @@ export const deleteProductById = async (request, response) => {
     response.status(200).json({ success: true, message: 'Product deleted successfully', data: id })
   } catch (error) {
     console.error('Error deleting product:', error.message)
-    response.status(404).json({ success: false, message: 'Product not found' })
+    response.status(500).json({ success: false, message: 'Server error' })
   }
 }
 // This code defines the product controller functions for a RESTful API using Express.js and Mongoose.
