@@ -51,8 +51,8 @@ export const createProduct = async (request, response) => {
   // user will send product data in the request body
   const product = request.body
 
-  if (!product.name && !product.price && !product.image) {
-    response.status(400).json({ succes: false, message: 'Invalid product data, please provide all the fields' })
+  if (!product.name || !product.price || !product.image) {
+    return response.status(400).json({ success: false, message: 'Invalid product data, please provide all the fields: name, price, and image' })
   }
 
   // create a new product instance
