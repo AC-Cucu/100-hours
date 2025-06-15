@@ -11,9 +11,51 @@ const app = express()
 // Middleware to parse JSON request bodies
 app.use(express.json())
 
-app.get('/api/products', (request, response) => {})
+app.get('/api/products', async (request, response) => {
+  try {
+    // Fetch all products from the database
+    const products = await Product.find()
+
+    // Send the products as a JSON response
+    response.status(200).json({ success: true, message: 'Products fetched successfully', data: products })
+  } catch (error) {
+    console.error('Error fetching products:', error)
+    response.status(500).json({ success: false, message: 'Internal server error' })
+  }
+})
+
+app.get('/api/products/:id', async (request, response) => {
+  try {
+    const { id } = request.params
+    const product = await Product.findById(id)
+
+    // Send the product as a JSON response
+    response.status(200).json({ success: true, message: 'Product fetched successfully', data: product })
+  } catch (error) {
+    console.error('Error fetching product:', error)
+    response.status(500).json({ success: false, message: 'Internal server error' })
+  }
+})
+
+app.patch('/api/products/:id', async (request, response) => {
+  try {
+    const { id } = request.params
+    const updatedProduct = request.body
+
+    await Product.findByIdAndUpdate(id, updatedProduct, { new: true })
+
+    // Send the updated product as a JSON response
+    response.status(200).json({ success: true, message: 'Product updated successfully', data: updatedProduct })
+  } catch (error) {
+    console.error('Error updating product:', error.message)
+    response.status(500).json({ success: false, message: 'Internal server error' })
+  }
+})
+
 app.post('/api/products', async (request, response) => {
-  const product = request.body // user will send product data in the request body
+  // user will send product data in the request body
+  const product = request.body
+
   if (!product.name && !product.price && !product.image) {
     response.status(400).json({ succes: false, message: 'Invalid product data, please provide all the fields' })
   }
@@ -25,7 +67,7 @@ app.post('/api/products', async (request, response) => {
     await newProduct.save()
     response.status(201).json({ success: true, message: 'Product created successfully', data: product })
   } catch (error) {
-    console.error('Error creating product:', error)
+    console.error('Error creating product:', error.message)
     response.status(500).json({ success: false, message: 'Internal server error' })
   }
 })
@@ -38,7 +80,7 @@ app.delete('/api/products/:id', async (request, response) => {
     await Product.findByIdAndDelete(id)
     response.status(200).json({ success: true, message: 'Product deleted successfully', data: id })
   } catch (error) {
-    console.error('Error deleting product:', error)
+    console.error('Error deleting product:', error.message)
     response.status(404).json({ success: false, message: 'Product not found' })
   }
 })
