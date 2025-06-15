@@ -3,6 +3,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import { connectDB } from './config/db.js'
 import Product from './models/product.model.js'
+import mongoose from 'mongoose'
 
 dotenv.config()
 
@@ -40,9 +41,13 @@ app.get('/api/products/:id', async (request, response) => {
 app.patch('/api/products/:id', async (request, response) => {
   try {
     const { id } = request.params
-    const updatedProduct = request.body
+    const product = request.body
 
-    await Product.findByIdAndUpdate(id, updatedProduct, { new: true })
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return response.status(404).json({ success: false, message: 'Invalid product ID' })
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(id, product, { new: true })
 
     // Send the updated product as a JSON response
     response.status(200).json({ success: true, message: 'Product updated successfully', data: updatedProduct })
@@ -74,6 +79,11 @@ app.post('/api/products', async (request, response) => {
 
 app.delete('/api/products/:id', async (request, response) => {
   const { id } = request.params
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return response.status(404).json({ success: false, message: 'Invalid product ID' })
+  }
+
   console.log('Deleting product with ID:', id)
 
   try {
